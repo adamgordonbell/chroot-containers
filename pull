@@ -7,4 +7,4 @@ echo "Pulling image $image"
 id=$(docker create "$image")
 
 echo "export image $id"
-docker export "$id" -o "${image}_fs.tar.gz"
+docker export "$id" -o "./assets/${image}.tar.gz"

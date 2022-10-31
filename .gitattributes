@@ -1,3 +1,0 @@
-*.gz filter=lfs diff=lfs merge=lfs -text
-redis_fs.tar.gz filter=lfs diff=lfs merge=lfs -text
-hello-world_fs.tar.gz filter=lfs diff=lfs merge=lfs -text
