@@ -2,6 +2,7 @@ package main
 
 import (
 	"archive/tar"
+	"compress/gzip"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -9,13 +10,14 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"syscall"
 )
 
 func main() {
 	dir := extract("./assets/hello-world_fs.tar.gz")
 	chroot(dir, "/hello")
-	fmt.Printf("removing %s", dir)
+	fmt.Printf("removing %s\n", dir)
 	defer os.RemoveAll(dir)
 
 }
@@ -30,23 +32,36 @@ func chroot(root string, call string) {
 }
 
 func extract(tar string) string {
-	dir, err := ioutil.TempDir("", tar)
+	var nonAlphanumericRegex = regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
+
+	prefix := nonAlphanumericRegex.ReplaceAllString(tar, "_")
+	dir, err := ioutil.TempDir("", prefix)
 	if err != nil {
 		log.Fatal(err)
+	} else {
+		fmt.Printf("created %s\n", dir)
 	}
 	must(Untar(tar, dir))
-	fmt.Printf("Extracted to %s", dir)
+	fmt.Printf("Extracted to %s\n", dir)
 	return dir
 }
 
 func Untar(source string, dst string) error {
+	fmt.Printf("Extracting %s to %s\n", source, dst)
+
 	r, err := os.Open(source)
 	if err != nil {
 		return err
 	}
 	defer r.Close()
 
-	tr := tar.NewReader(r)
+	gzr, err := gzip.NewReader(r)
+	if err != nil {
+		log.Fatal("ExtractTarGz: NewReader failed: ", err)
+	}
+	defer gzr.Close()
+
+	tr := tar.NewReader(gzr)
 
 	for {
 		header, err := tr.Next()
