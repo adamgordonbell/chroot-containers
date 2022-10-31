@@ -19,15 +19,16 @@ func main() {
 		tar := fmt.Sprintf("./assets/%s.tar.gz", os.Args[2])
 		cmd := os.Args[3]
 		dir := createTempDir(tar)
+		defer os.RemoveAll(dir)
 		must(unTar(tar, dir))
 		chroot(dir, cmd)
-		defer must(os.RemoveAll(dir))
 	case "pull":
 		image := os.Args[2]
 		pullImage(image)
 	default:
 		panic("what?")
 	}
+
 }
 
 func pullImage(image string) {
@@ -39,6 +40,13 @@ func pullImage(image string) {
 }
 
 func chroot(root string, call string) {
+	//Hold onto old root
+	oldroot, err := os.Open("/")
+	if err != nil {
+		panic(err)
+	}
+	defer oldroot.Close()
+
 	fmt.Printf("Running %s in %s\n", call, root)
 	cmd := exec.Command(call)
 	must(syscall.Chroot(root))
@@ -46,6 +54,11 @@ func chroot(root string, call string) {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	must(cmd.Run())
+
+	//Go back to old root
+	//So that we can clean up the temp dir
+	must(oldroot.Chdir())
+	must(syscall.Chroot("."))
 }
 
 func createTempDir(name string) string {
