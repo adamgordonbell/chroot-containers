@@ -1,0 +1,10 @@
+#!/bin/bash
+
+defaultImage="hello-world"
+
+image="${1:-$defaultImage}"
+echo "Pulling image $image"
+id=$(docker create "$image")
+
+echo "export image $id"
+docker export "$id" -o "${image}_fs.tar.gz"
