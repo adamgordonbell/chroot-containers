@@ -16,7 +16,7 @@ import (
 func main() {
 	switch os.Args[1] {
 	case "run":
-		tar := os.Args[2]
+		tar := fmt.Sprintf("./assets/%s.tar.gz", os.Args[2])
 		cmd := os.Args[3]
 		dir := createTempDir(tar)
 		must(unTar(tar, dir))
@@ -55,14 +55,13 @@ func createTempDir(name string) string {
 	dir, err := ioutil.TempDir("", prefix)
 	if err != nil {
 		log.Fatal(err)
-	} else {
-		fmt.Printf("created %s\n", dir)
 	}
+	// fmt.Printf("created %s\n", dir)
 	return dir
 }
 
 func unTar(source string, dst string) error {
-	fmt.Printf("Extracting %s %s\n", source, dst)
+	// fmt.Printf("Extracting %s %s\n", source, dst)
 	r, err := os.Open(source)
 	if err != nil {
 		return err
