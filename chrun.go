@@ -3,6 +3,7 @@ package main
 import (
 	"archive/tar"
 	"compress/gzip"
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,10 +13,13 @@ import (
 	"path/filepath"
 	"regexp"
 	"syscall"
+
+	"github.com/codeclysm/extract"
+	_ "github.com/codeclysm/extract"
 )
 
 func main() {
-	dir := extract("./assets/hello-world_fs.tar.gz")
+	dir := extract1("./assets/hello-world_fs.tar.gz")
 	chroot(dir, "/hello")
 	fmt.Printf("removing %s\n", dir)
 	defer os.RemoveAll(dir)
@@ -31,7 +35,7 @@ func chroot(root string, call string) {
 	_ = cmd.Run()
 }
 
-func extract(tar string) string {
+func extract1(tar string) string {
 	var nonAlphanumericRegex = regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
 
 	prefix := nonAlphanumericRegex.ReplaceAllString(tar, "_")
@@ -41,9 +45,21 @@ func extract(tar string) string {
 	} else {
 		fmt.Printf("created %s\n", dir)
 	}
-	must(Untar(tar, dir))
+	must(Untar2(tar, dir))
 	fmt.Printf("Extracted to %s\n", dir)
 	return dir
+}
+func Untar2(source string, dst string) error {
+	r, err := os.Open(source)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+
+	// data, _ := ioutil.ReadFile(source)
+	ctx := context.Background()
+	// buffer := bytes.NewBuffer(data)
+	return extract.Archive(ctx, r, dst, nil)
 }
 
 func Untar(source string, dst string) error {
