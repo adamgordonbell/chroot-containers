@@ -1,10 +1,12 @@
 # Containers using only chroot
 
-This is demo-ware and probably shouldn't be used.
+This is demo-ware and probably shouldn't be used. 
+
+[Explanation](https://earthly.dev/blog/chroot).
 
 Requirements:
 
- * Linux OS
+* Linux OS
 
 ## Usage
 
@@ -14,7 +16,8 @@ Requirements:
 
 ## Example
 
-Pull image
+Pull image:
+
 ```
 > ./chrun pull redis
 Pulling image redis
@@ -22,6 +25,7 @@ export image 16b87aa63c8f3a1e14a50feb94cba39eaa5d19bec64d90ff76c3ded058ad09c8
 ```
 
 Run Redis server with chroot:
+
 ```
 > chrun run redis "/usr/local/bin/redis-server"
 
@@ -54,6 +58,7 @@ Running /usr/local/bin/redis-server in /tmp/_assets_redis_tar_gz4234401501
 ```
 
 While that's running connect to it in another chroot:
+
 ```
 > chrun run redis "/usr/local/bin/redis-cli"
 
@@ -67,3 +72,9 @@ OK
 ```
 
 And there you go, containers using only chroot.
+
+## Caveats
+
+I'm sure there are containers this will not run. PRs and issues welcome.
+
+I'd love to have chrun extract the entrypoint from the manifest and add it as a shell script to the tar, so that the entry-point in `chrun run <imagename> <entry-point>` was optional.
