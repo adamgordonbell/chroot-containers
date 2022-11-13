@@ -52,7 +52,10 @@ func chroot(root string, call string) {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	must(cmd.Run())
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	//Go back to old root
 	//So that we can clean up the temp dir
