@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -65,7 +64,7 @@ func createTempDir(name string) string {
 	var nonAlphanumericRegex = regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
 
 	prefix := nonAlphanumericRegex.ReplaceAllString(name, "_")
-	dir, err := ioutil.TempDir("", prefix)
+	dir, err := os.MkdirTemp("", prefix)
 	if err != nil {
 		log.Fatal(err)
 	}
