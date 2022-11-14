@@ -1,10 +1,13 @@
 #!/bin/bash
 
+set -e
+
 defaultImage="hello-world"
 
 image="${1:-$defaultImage}"
-echo "Pulling image $image"
-id=$(docker create "$image")
+container=$(docker create "$image")
 
-echo "export image $id"
-docker export "$id" -o "./assets/${image}.tar.gz"
+docker export "$container" -o "./assets/${image}.tar.gz" > /dev/null
+docker rm "$container" > /dev/null
+
+echo "Image content stored in assets/${image}.tar.gz"
