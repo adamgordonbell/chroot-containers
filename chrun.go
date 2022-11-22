@@ -15,8 +15,20 @@ import (
 func main() {
 	switch os.Args[1] {
 	case "run":
-		tar := fmt.Sprintf("./assets/%s.tar.gz", os.Args[2])
-		cmd := os.Args[3]
+		img := os.Args[2]
+		tar := fmt.Sprintf("./assets/%s.tar.gz", img)
+
+		cmd := ""
+		if len(os.Args) > 3 {
+			cmd = os.Args[3]
+		} else {
+			buf, err := os.ReadFile(fmt.Sprintf("./assets/%s-cmd", img))
+			if err != nil {
+				panic(err)
+			}
+			cmd = string(buf)
+		}
+
 		dir := createTempDir(tar)
 		defer os.RemoveAll(dir)
 		must(unTar(tar, dir))

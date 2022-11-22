@@ -76,5 +76,3 @@ And there you go, containers using only chroot.
 ## Caveats
 
 I'm sure there are containers this will not run. PRs and issues welcome.
-
-I'd love to have chrun extract the entrypoint from the manifest and add it as a shell script to the tar, so that the entry-point in `chrun run <imagename> <entry-point>` was optional.
