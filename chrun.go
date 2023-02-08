@@ -52,18 +52,23 @@ func pullImage(image string) {
 
 func chroot(root string, call string) {
 	//Hold onto old root
-	oldroot, err := os.Open("/")
+	oldrootHandle, err := os.Open("/")
 	if err != nil {
 		panic(err)
 	}
-	defer oldroot.Close()
+	defer oldrootHandle.Close()
 
+	//Create command
 	fmt.Printf("Running %s in %s\n", call, root)
 	cmd := exec.Command(call)
-	must(syscall.Chroot(root))
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
+	//New Root time
+	must(syscall.Chdir(root))
+	must(syscall.Chroot(root))
+
 	err = cmd.Run()
 	if err != nil {
 		fmt.Println(err)
@@ -71,8 +76,9 @@ func chroot(root string, call string) {
 
 	//Go back to old root
 	//So that we can clean up the temp dir
-	must(oldroot.Chdir())
+	must(syscall.Fchdir(int(oldrootHandle.Fd())))
 	must(syscall.Chroot("."))
+
 }
 
 func createTempDir(name string) string {
@@ -83,7 +89,7 @@ func createTempDir(name string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// fmt.Printf("created %s\n", dir)
+	//fmt.Printf("created %s\n", dir)
 	return dir
 }
 
