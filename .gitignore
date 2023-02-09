@@ -2,3 +2,5 @@
 chrun
 assets/*
 chroot-containers
+temp
+temp/*
