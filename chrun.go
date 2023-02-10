@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -15,14 +16,18 @@ import (
 func main() {
 	switch os.Args[1] {
 	case "run":
-		img := os.Args[2]
-		tar := fmt.Sprintf("./assets/%s.tar.gz", img)
+		image := os.Args[2]
+		tar := fmt.Sprintf("./assets/%s.tar.gz", image)
+
+		if _, err := os.Stat(tar); errors.Is(err, os.ErrNotExist) {
+			panic(err)
+		}
 
 		cmd := ""
 		if len(os.Args) > 3 {
 			cmd = os.Args[3]
 		} else {
-			buf, err := os.ReadFile(fmt.Sprintf("./assets/%s-cmd", img))
+			buf, err := os.ReadFile(fmt.Sprintf("./assets/%s-cmd", image))
 			if err != nil {
 				panic(err)
 			}
